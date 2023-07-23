@@ -81,11 +81,9 @@ public class CryptoAnalyzer {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] source = readFileToByteArray(fileName);
         char[] temporary = new char[source.length];
-        boolean isComaSpaceTogether = false;
-        int count = 0;
+        boolean isComaSpaceTogether;
 
         for(int key = 1; key < alphabet.size(); key++){
-            count++;
             int index = 0;
             int comaCount =0;
             int spaceCount =0;
@@ -107,6 +105,7 @@ public class CryptoAnalyzer {
                 }
                 index++;
             }
+            //умова співпадіння, коли є послідовність кома пробіл, пробілів більше ком і середня довжина слова меньше 8
             if(isComaSpaceTogether && comaCount <= spaceCount && ((temporary.length - spaceCount)/(spaceCount+1)) < 8){
                 break;
             }
@@ -138,9 +137,12 @@ public class CryptoAnalyzer {
             }
             if(Files.notExists(path)) {
                 System.out.println("File is not exist, please enter valid filename or 'exit' to stop");
-                isFileExist = false;
             } else {
                 isFileExist = true;
+            }
+            if(!Files.isRegularFile(path)){
+                System.out.println("It is not a File, please enter valid filename or 'exit' to stop");
+                isFileExist = false;
             }
 
         }
@@ -173,8 +175,7 @@ public class CryptoAnalyzer {
     }
     private static String getNewFileName(String fileName, String suffix){
         int dotIndex = fileName.lastIndexOf(".");
-        String outputFileName = fileName.substring(0, dotIndex) + suffix + fileName.substring(dotIndex);
-       return outputFileName;
+        return fileName.substring(0, dotIndex) + suffix + fileName.substring(dotIndex);
     }
     private static void writeToFile(Path fileName, ByteArrayOutputStream outputStream){
         try {
