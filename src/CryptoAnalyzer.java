@@ -7,9 +7,11 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class CryptoAnalyzer {
-    private static ArrayList<Character> alphabet =   new ArrayList(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-            'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-            ',', '.', '"', ' ', ':', '-', '!', '?', '(', ')'));
+    private static ArrayList<Character> alphabet =   new ArrayList(Arrays.asList('0', '1', '2', '3',
+            '4', '5', '6', '7', '8', '9','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
+            'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+            'w', 'x', 'y', 'z', ',', '.', '"', ' ', ':', '-', '!', '?', '(', ')'));
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         String fileName;
@@ -46,18 +48,15 @@ public class CryptoAnalyzer {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] source = readFileToByteArray(fileName);
         for (byte symbol: source ){
-           if(symbol == 13) {// заміна переносу на пробіл
-               symbol = 32;
-           }
-           Character castChar = Character.toLowerCase((char)symbol);
-
-           if(alphabet.contains(castChar)) {
-               int index = alphabet.indexOf(castChar);
+           if(alphabet.contains((char)symbol)) {
+               int index = alphabet.indexOf((char)symbol);
                int encrypted = (index + key) % alphabet.size();
                if(encrypted < 0){
                    encrypted = alphabet.size() + encrypted;
                }
                outputStream.write(alphabet.get(encrypted));
+           } else {
+               outputStream.write(symbol);
            }
         }
         Path encryptedFile = Path.of(getNewFileName(fileName, "encrypted"));
@@ -68,11 +67,15 @@ public class CryptoAnalyzer {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         for (byte symbol: source ){
-            int decrypted = (alphabet.indexOf((char)symbol) - key)% alphabet.size();
+            if(alphabet.contains((char)symbol)){
+                int decrypted = (alphabet.indexOf((char)symbol) - key)% alphabet.size();
             if(decrypted < 0) {
                 decrypted = alphabet.size() + decrypted;
             }
             outputStream.write(alphabet.get(decrypted));
+            } else {
+                outputStream.write(symbol);
+            }
         }
         Path decryptedFile = Path.of(getNewFileName(fileName, "decrypted"));
         writeToFile(decryptedFile, outputStream);
@@ -89,11 +92,15 @@ public class CryptoAnalyzer {
             int spaceCount =0;
             isComaSpaceTogether = false;
             for (byte symbol: source ){
-                int decrypted = (alphabet.indexOf((char)symbol) - key)% alphabet.size();
-                if(decrypted < 0) {
-                    decrypted = alphabet.size() + decrypted;
+                if(alphabet.contains((char)symbol)) {
+                    int decrypted = (alphabet.indexOf((char) symbol) - key) % alphabet.size();
+                    if (decrypted < 0) {
+                        decrypted = alphabet.size() + decrypted;
+                    }
+                    temporary[index] = alphabet.get(decrypted);
+                } else {
+                    temporary[index] = (char)symbol;
                 }
-                temporary[index] = alphabet.get(decrypted);
                 if(temporary[index] == ','){// підраховуємо кількість ком
                     comaCount++;
                 }
